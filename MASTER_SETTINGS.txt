@@ -1,0 +1,174 @@
+================================================================
+JULIAN METHOD — 全設定マスターファイル
+最終更新: 2026-04-17
+================================================================
+
+
+----------------------------------------------------------------
+1. アカウント情報
+----------------------------------------------------------------
+
+Instagram/Threads アカウント
+  ハンドル      : @thejulianmethod
+  表示名        : Julian | Operator Systems
+  Threads UserID: 27003501039257509
+
+Gumroad 商品URL
+  https://kentaroun.gumroad.com/l/THEJULIANMETHOD
+  価格: $147
+
+Facebook Developer App
+  App ID  : 1689886668836699
+  App Name: ジュリアン
+
+
+----------------------------------------------------------------
+2. APIキー・トークン
+----------------------------------------------------------------
+
+Threads Access Token
+  config.txtおよびGitHub Secretsに保存済み
+  ※有効期限あり。切れたら再取得が必要
+
+Anthropic API Key
+  config.txtおよびGitHub Secretsに保存済み
+
+GitHub Repository
+  https://github.com/nagashimakentaro116-hub/julian-autopost
+  ※Secretsに以下を設定済み:
+    - THREADS_ACCESS_TOKEN
+    - THREADS_USER_ID
+    - ANTHROPIC_API_KEY
+
+
+----------------------------------------------------------------
+3. 自動投稿システム（2系統）
+----------------------------------------------------------------
+
+【系統A】GitHub Actions（メイン・推奨）
+  場所    : ~/Julian_Autopost/.github/workflows/autopost.yml
+  スクリプト: ~/Julian_Autopost/cloud_post.py
+  動作    : Macがオフ・スリープ中でも稼働
+  投稿時間: NY 7AM / 12PM / 7PM (UTC 11:00/16:00/23:00)
+  費用    : 月約$0.32（Claude API）
+
+【系統B】ローカル launchd（バックアップ）
+  場所    : ~/Julian_Autopost/autopost.py
+  plist   : ~/Library/LaunchAgents/com.julian.autopost.plist
+  動作    : Mac起動中・スリープ復帰後に稼働
+  投稿時間: JST 21:00 / 02:00 / 09:00
+
+投稿文自動生成
+  スクリプト: ~/Julian_Autopost/generate_posts.py
+  動作    : キューが6本未満になるとClaudeが自動生成・添削
+  毎朝    : 08:00 JSTに補充チェック
+
+
+----------------------------------------------------------------
+4. フォルダ構成
+----------------------------------------------------------------
+
+~/Julian_Autopost/
+  ├── autopost.py          ローカル自動投稿スクリプト
+  ├── cloud_post.py        GitHub Actions用スクリプト
+  ├── generate_posts.py    投稿文自動生成スクリプト
+  ├── config.txt           APIキー設定（要秘密管理）
+  ├── posts_queue.csv      投稿キュー
+  ├── images/              投稿用画像フォルダ
+  ├── SETUP_GUIDE.txt      セットアップ手順
+  ├── MASTER_SETTINGS.txt  このファイル
+  └── .github/
+      └── workflows/
+          └── autopost.yml GitHub Actionsワークフロー
+
+
+----------------------------------------------------------------
+5. チーム編成
+----------------------------------------------------------------
+
+オーナー              : あなた（最終意思決定）
+ディレクター          : Claude（総括・戦略）
+マーケター            : Claude（集客戦略・市場調査）
+SNS運用担当者         : Claude（投稿文作成・競合分析）
+投稿添削者            : Claude（品質チェック・英語校正）
+画像生成担当者        : Claude × gpt-image-2（Julian画像生成・管理）
+
+【画像生成担当者の設定】
+  モデル      : gpt-image-2（OpenAI API）
+  APIキー     : OpenAI（config.txtまたは環境変数 OPENAI_API_KEY）
+  参照画像    : ~/Julian_Autopost/images/reference/ref4.png
+  出力先      : ~/Julian_Autopost/images/
+  生成方法    : images.edit()で参照画像を渡して人物の一貫性を保つ
+  確定済み画像: ~/Desktop/julian_v3.png（承認済みポートレート）
+
+  【追加業務：動画生成用プロンプト作成】
+  対象ツール  : Sora / Runway / Kling / HeyGen など（指定に応じて）
+  出力形式    : 英語プロンプト（カメラワーク・照明・シーン・人物描写を含む）
+  ブランド遵守: Quiet Luxury・無表情・断言型・絵文字ゼロ
+  人物設定    : julian_approved.pngの人物を基準に記述
+
+
+----------------------------------------------------------------
+6. ブランドガイドライン（Julian）
+----------------------------------------------------------------
+
+キャラクター: AIオペレーター（非人間）
+商品       : $147 PDF（AIキャラ構築システム）
+ターゲット : アメリカ英語圏・パッシブインカム志向
+トーン     : Quiet Luxury・静かな権威・ノーハイプ
+禁止事項   : 絵文字・感嘆符・hustle/grind/guru/hack
+
+
+----------------------------------------------------------------
+7. 差別化ポイント（競合との違い）
+----------------------------------------------------------------
+
+競合(@baddieinbiz, @itsolivia.ai)
+  → 明るい・絵文字多用・カジュアル・ハイプ系
+
+Julian
+  → 無表情・絵文字ゼロ・静かな断言・Quiet Luxury
+
+
+----------------------------------------------------------------
+8. 投稿スケジュール（NY時間基準）
+----------------------------------------------------------------
+
+7:00 AM ET  → 出勤前チェック（最高エンゲージメント帯）
+12:00 PM ET → 昼休みSNS閲覧ピーク
+7:00 PM ET  → 仕事後・夜の利用最多時間帯
+
+
+----------------------------------------------------------------
+9. Threads Access Token 再取得方法
+----------------------------------------------------------------
+
+トークンの有効期限が切れた場合:
+1. https://developers.facebook.com/ を開く
+2. アプリ「ジュリアン」→「Threads APIにアクセス」→「設定」
+3. 「ユーザートークン生成ツール」でトークンを再生成
+4. config.txtのTHREADS_ACCESS_TOKENを更新
+5. GitHub Secretsも更新:
+   cd ~/Julian_Autopost
+   gh secret set THREADS_ACCESS_TOKEN --body "新しいトークン"
+
+
+----------------------------------------------------------------
+10. トラブルシューティング
+----------------------------------------------------------------
+
+投稿されない（GitHub Actions）
+  → https://github.com/nagashimakentaro116-hub/julian-autopost/actions
+  → 失敗しているRunを確認
+
+投稿されない（ローカル）
+  → cat ~/Julian_Autopost/autopost_log.txt
+  → launchctl list | grep julian
+
+キューが空
+  → python3 ~/Julian_Autopost/generate_posts.py を実行
+
+トークン期限切れエラー
+  → 「9. Threads Access Token 再取得方法」を参照
+
+================================================================
