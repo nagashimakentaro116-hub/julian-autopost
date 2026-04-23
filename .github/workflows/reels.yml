@@ -1,0 +1,32 @@
+name: Julian Reels Post
+
+on:
+  schedule:
+    # Monday 7:00 PM ET = Tuesday 00:00 UTC
+    - cron: '0 0 * * 2'
+    # Wednesday 7:00 PM ET = Thursday 00:00 UTC
+    - cron: '0 0 * * 4'
+    # Friday 7:00 PM ET = Saturday 00:00 UTC
+    - cron: '0 0 * * 6'
+  workflow_dispatch:
+
+jobs:
+  post-reel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Post Reel to Instagram
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+        run: python post_reels.py
