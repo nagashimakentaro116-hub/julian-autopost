@@ -20,8 +20,10 @@ POSTED_LOG = Path(os.path.expanduser("~/Julian_Autopost/posted_reels.txt"))
 CAPTION_DEFAULT = (
     "The system runs. You don't have to.\n\n"
     "Julian | Operator Systems\n\n"
+    "📍 New York, NY\n\n"
     "#AIbusiness #passiveincome #digitalproducts #onlinebusiness "
-    "#aitools #solopreneur #makemoneyonline #workfromanywhere"
+    "#aitools #solopreneur #makemoneyonline #workfromanywhere "
+    "#newyork #nyc"
 )
 API_BASE = "https://graph.instagram.com/v21.0"
 # ────────────────────────────────────────────────────
