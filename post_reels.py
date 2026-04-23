@@ -57,14 +57,20 @@ def get_caption(reel_path):
 
 
 def upload_video_to_public_url(reel_path):
-    """freeimage.host にアップロードして公開URLを取得"""
-    url = "https://freeimage.host/api/1/upload"
+    """catbox.moe に動画をアップロードして公開URLを取得（動画対応・永続）"""
+    url = "https://catbox.moe/user/api.php"
     with open(reel_path, "rb") as f:
-        resp = requests.post(url, data={"key": "6d207e02198a847aa98d0a2a901485a5"}, files={"source": f})
-    data = resp.json()
-    if data.get("status_code") == 200:
-        return data["image"]["url"]
-    raise Exception(f"Upload failed: {data}")
+        resp = requests.post(
+            url,
+            data={"reqtype": "fileupload"},
+            files={"fileToUpload": f},
+            timeout=120,
+        )
+    resp.raise_for_status()
+    video_url = resp.text.strip()
+    if not video_url.startswith("http"):
+        raise Exception(f"Upload failed: {video_url}")
+    return video_url
 
 
 def create_media_container(video_url, caption):
