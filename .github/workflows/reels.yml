@@ -35,6 +35,7 @@ jobs:
       - name: Post Reel to Instagram
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: python post_reels.py
 
       - name: Commit posted_reels.txt

@@ -80,17 +80,17 @@ def get_caption(reel_path):
 
 
 def merge_music(reel_path):
-    """reels/music/ のBGMを動画にミックス。mp3がなければ元動画を返す。"""
+    """reels/music/ のBGMを動画にミックス。(merged_path, track_name)を返す。"""
     if not MUSIC_DIR.exists():
-        return reel_path
+        return reel_path, "(none)"
     tracks = sorted(list(MUSIC_DIR.glob("*.mp3")) + list(MUSIC_DIR.glob("*.m4a")) + list(MUSIC_DIR.glob("*.wav")))
     if not tracks:
         print("No music in reels/music/ — posting with original audio only")
-        return reel_path
+        return reel_path, "(none)"
 
     if not shutil.which("ffmpeg"):
         print("ffmpeg not installed — skipping music merge")
-        return reel_path
+        return reel_path, "(ffmpeg missing)"
 
     track = random.choice(tracks)
     print(f"Merging music: {track.name}")
@@ -132,10 +132,10 @@ def merge_music(reel_path):
         result = subprocess.run(cmd2, capture_output=True, text=True)
         if result.returncode != 0:
             print(f"  ffmpeg failed: {result.stderr[-500:]}")
-            return reel_path
+            return reel_path, track.name
 
     print(f"  Merged -> {out_path}")
-    return out_path
+    return out_path, track.name
 
 
 def upload_video_to_public_url(reel_path):
@@ -201,6 +201,47 @@ def publish_container(container_id):
     return data["id"]
 
 
+def send_email_notification(reel_name, post_id, caption, music_name):
+    """Resend経由で投稿完了メールを送る"""
+    api_key = os.environ.get("RESEND_API_KEY", "")
+    if not api_key:
+        print("RESEND_API_KEY not set — skipping email")
+        return
+    post_url = f"https://www.instagram.com/p/{post_id}/"
+    subject = f"[Julian Reels] {reel_name} 投稿完了"
+    html = f"""
+    <h2>Reels 投稿完了</h2>
+    <p><b>ファイル:</b> {reel_name}</p>
+    <p><b>投稿ID:</b> {post_id}</p>
+    <p><b>BGM:</b> {music_name}</p>
+    <p><b>投稿URL:</b> <a href="https://www.instagram.com/thejulianmethod/">@thejulianmethod</a></p>
+    <hr>
+    <p><b>キャプション:</b></p>
+    <pre style="white-space:pre-wrap;font-family:inherit">{caption}</pre>
+    """
+    try:
+        resp = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": "Julian Bot <onboarding@resend.dev>",
+                "to": "nagashimakentaro116@gmail.com",
+                "subject": subject,
+                "html": html,
+            },
+            timeout=30,
+        )
+        if resp.status_code in (200, 201):
+            print(f"Email sent: {resp.json().get('id', '')}")
+        else:
+            print(f"Email failed: {resp.status_code} {resp.text[:200]}")
+    except Exception as e:
+        print(f"Email exception: {e}")
+
+
 def main():
     if not IG_TOKEN:
         print("ERROR: INSTAGRAM_ACCESS_TOKEN not set")
@@ -218,7 +259,7 @@ def main():
     print(f"Caption preview: {caption[:80]}...")
 
     print("Merging music...")
-    merged = merge_music(reel)
+    merged, music_name = merge_music(reel)
 
     print("Uploading video...")
     video_url = upload_video_to_public_url(merged)
@@ -237,6 +278,8 @@ def main():
 
     mark_posted(original_name)
     print(f"Marked as posted: {original_name}")
+
+    send_email_notification(original_name, post_id, caption, music_name)
 
 
 if __name__ == "__main__":
