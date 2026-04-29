@@ -22,7 +22,7 @@ from datetime import datetime
 # ─── 設定 ───────────────────────────────────────────
 IG_USER_ID = "26471868175804350"
 IG_TOKEN = os.environ.get("INSTAGRAM_ACCESS_TOKEN", "")
-BASE_DIR = Path(os.path.expanduser("~/Julian_Autopost"))
+BASE_DIR = Path(__file__).parent
 REELS_DIR = BASE_DIR / "reels"
 MUSIC_DIR = REELS_DIR / "music"
 POSTED_LOG = BASE_DIR / "posted_reels.txt"
