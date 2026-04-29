@@ -92,7 +92,16 @@ def merge_music(reel_path):
         print("ffmpeg not installed — skipping music merge")
         return reel_path, "(ffmpeg missing)"
 
-    track = random.choice(tracks)
+    # .bgmファイルがあれば指定BGMを使用、なければランダム
+    bgm_override = reel_path.with_suffix(".bgm")
+    if bgm_override.exists():
+        track_name = bgm_override.read_text().strip()
+        track = MUSIC_DIR / track_name
+        if not track.exists():
+            print(f"Specified BGM not found: {track_name}, falling back to random")
+            track = random.choice(tracks)
+    else:
+        track = random.choice(tracks)
     print(f"Merging music: {track.name}")
 
     out_path = Path(tempfile.gettempdir()) / f"merged_{reel_path.name}"

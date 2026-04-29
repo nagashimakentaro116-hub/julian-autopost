@@ -8,6 +8,8 @@ on:
     - cron: '0 0 * * 4'
     # Friday 7:00 PM ET = Saturday 00:00 UTC
     - cron: '0 0 * * 6'
+    # One-time: May 1 7:00 PM ET = May 1 23:00 UTC
+    - cron: '0 23 1 5 *'
   workflow_dispatch:
 
 permissions:
