@@ -138,20 +138,43 @@ def merge_music(reel_path):
     return out_path, track.name
 
 
-def upload_video_to_public_url(reel_path):
-    url = "https://catbox.moe/user/api.php"
+def _upload_to_0x0(reel_path):
     with open(reel_path, "rb") as f:
         resp = requests.post(
-            url,
-            data={"reqtype": "fileupload"},
+            "https://0x0.st",
+            files={"file": f},
+            timeout=180,
+        )
+    resp.raise_for_status()
+    url = resp.text.strip()
+    if not url.startswith("http"):
+        raise Exception(f"0x0.st upload failed: {url}")
+    return url
+
+
+def _upload_to_litterbox(reel_path):
+    with open(reel_path, "rb") as f:
+        resp = requests.post(
+            "https://litterbox.catbox.moe/resources/internals/api.php",
+            data={"reqtype": "fileupload", "time": "72h"},
             files={"fileToUpload": f},
             timeout=180,
         )
     resp.raise_for_status()
-    video_url = resp.text.strip()
-    if not video_url.startswith("http"):
-        raise Exception(f"Upload failed: {video_url}")
-    return video_url
+    url = resp.text.strip()
+    if not url.startswith("http"):
+        raise Exception(f"litterbox upload failed: {url}")
+    return url
+
+
+def upload_video_to_public_url(reel_path):
+    for attempt, fn in enumerate([_upload_to_0x0, _upload_to_litterbox], 1):
+        try:
+            print(f"  Upload attempt {attempt}: {fn.__name__}")
+            return fn(reel_path)
+        except Exception as e:
+            print(f"  Attempt {attempt} failed: {e}")
+    raise Exception("All upload attempts failed")
 
 
 def create_media_container(video_url, caption):
