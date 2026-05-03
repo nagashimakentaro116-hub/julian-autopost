@@ -7,7 +7,10 @@ THREADS_ACCESS_TOKEN = os.environ["THREADS_ACCESS_TOKEN"]
 THREADS_USER_ID = os.environ["THREADS_USER_ID"]
 ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
-VIDEO_URL = "https://github.com/nagashimakentaro116-hub/julian-autopost/releases/download/v-video-20260503212506/15.mp4"
+VIDEO_URL = os.environ.get(
+    "VIDEO_URL",
+    "https://github.com/nagashimakentaro116-hub/julian-autopost/releases/download/v-video-20260503212506/15.mp4"
+)
 
 BRAND_GUIDELINES = """
 You are a content writer for Julian, an AI operator character.
