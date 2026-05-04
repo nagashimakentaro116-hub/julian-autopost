@@ -86,6 +86,34 @@ def post_video():
     ).json()
     print(f"Published: {pub}")
 
+    if "id" not in pub:
+        raise Exception(f"Publish error: {pub}")
+
+    post_id = pub["id"]
+
+    # Step 4: 同じキャプションをコメントとして投稿
+    time.sleep(5)
+    comment_container = requests.post(
+        f"https://graph.threads.net/v1.0/{THREADS_USER_ID}/threads",
+        params={
+            "media_type": "TEXT",
+            "text": caption,
+            "reply_to_id": post_id,
+            "access_token": THREADS_ACCESS_TOKEN
+        }
+    ).json()
+    print(f"Comment container: {comment_container}")
+
+    if "id" not in comment_container:
+        raise Exception(f"Comment container error: {comment_container}")
+
+    time.sleep(3)
+    comment_pub = requests.post(
+        f"https://graph.threads.net/v1.0/{THREADS_USER_ID}/threads_publish",
+        params={"creation_id": comment_container["id"], "access_token": THREADS_ACCESS_TOKEN}
+    ).json()
+    print(f"Comment published: {comment_pub}")
+
 if __name__ == "__main__":
     post_video()
     print("Done.")
