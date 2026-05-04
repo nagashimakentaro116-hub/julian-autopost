@@ -2,7 +2,7 @@ name: Post Video 18
 
 on:
   schedule:
-    - cron: '0 11 12 5 *'  # May 12, 7AM EDT (11:00 UTC)
+    - cron: '0 23 12 5 *'  # May 12, 7PM EDT (23:00 UTC)
   workflow_dispatch:
 
 jobs:
