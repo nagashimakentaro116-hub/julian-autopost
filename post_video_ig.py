@@ -1,59 +1,29 @@
 """
 Instagram Reels One-Shot Poster
 VIDEO_URL 環境変数で指定した動画を Instagram Reels として投稿する
+キャプションは captions.json から CAPTION_INDEX 番目を使用する
 """
 
 import requests
 import time
 import os
+import json
 import tempfile
-import anthropic
+from pathlib import Path
 
 INSTAGRAM_ACCESS_TOKEN = os.environ["INSTAGRAM_ACCESS_TOKEN"]
 IG_USER_ID = "26471868175804350"
-ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 VIDEO_URL = os.environ["VIDEO_URL"]
+CAPTION_INDEX = int(os.environ.get("CAPTION_INDEX", "0"))
 API_BASE = "https://graph.instagram.com/v21.0"
-
-CAPTION_FOOTER = (
-    "\n\n📍 New York, NY\n"
-    "#newyork #nyc #aiavatar #passiveincome #aibusiness #digitalproducts "
-    "#sidehustle #financialfreedom #entrepreneurlife #makemoneyonline"
-)
-
-BRAND_GUIDELINES = """
-You are a content writer for Julian, an AI operator character.
-
-BRAND IDENTITY:
-- Julian is an AI character (not human) who represents a digital product system
-- Product: $147 PDF guide on building an AI operator brand on Instagram/Threads
-- Target audience: English-speaking Americans interested in passive income, AI tools, digital products
-- Tone: Quiet luxury, calm authority, no hype, no emojis, no exclamation marks
-- Competitors use loud/hype tone — Julian is the OPPOSITE: silent, powerful, restrained
-
-WRITING RULES:
-- No emojis ever
-- No exclamation marks
-- Short sentences (1-3 words per line ideal)
-- Always end with "Link in bio." on its own line
-- Never use words: hustle, grind, guru, hack, secret, amazing, incredible
-- Voice: calm, certain, slightly mysterious
-- English must sound like a native American speaker
-"""
+BASE_DIR = Path(__file__).parent
 
 
-def generate_caption():
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    message = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=200,
-        system=BRAND_GUIDELINES,
-        messages=[{
-            "role": "user",
-            "content": "Write ONE short Instagram Reels caption for a video of a man walking through a city. Calm, powerful, declarative tone. 2-4 lines max. End with 'Link in bio.' Return only the caption text."
-        }]
-    )
-    return message.content[0].text.strip() + CAPTION_FOOTER
+def load_caption():
+    captions_path = BASE_DIR / "captions.json"
+    captions = json.loads(captions_path.read_text(encoding="utf-8"))
+    idx = CAPTION_INDEX % len(captions)
+    return captions[idx]
 
 
 def download_video(url):
@@ -180,8 +150,8 @@ def send_email_notification(post_id, caption):
 
 
 def main():
-    caption = generate_caption()
-    print(f"Caption:\n{caption}\n")
+    caption = load_caption()
+    print(f"Caption index: {CAPTION_INDEX}\nCaption preview: {caption[:80]}...\n")
 
     local_path = download_video(VIDEO_URL)
 
