@@ -2,7 +2,7 @@ name: Post Video 16
 
 on:
   schedule:
-    - cron: '0 23 6 5 *'  # May 6, 7PM EDT (23:00 UTC)
+    - cron: '0 23 11 5 *'  # May 11, 7PM EDT (23:00 UTC)
   workflow_dispatch:
 
 jobs:
@@ -19,10 +19,10 @@ jobs:
       - name: Install dependencies
         run: pip install requests anthropic
 
-      - name: Post video to Threads
+      - name: Post video to Instagram
         env:
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           VIDEO_URL: "https://github.com/nagashimakentaro116-hub/julian-autopost/releases/download/v-video-16-20260503213645/16.mp4"
-        run: python post_video_once.py
+        run: python post_video_ig.py
